@@ -80,7 +80,6 @@
 	1. BWA에 사용될려면 ref fasta를 indexing 해야한다. 
 	   bwa index GCF_001433935.1_IRGSP-1.0_genomic.fna
 	2. bwa mem –t ‘thread’ ‘ref 파일 위치’/‘ref 파일 이름’ ‘fastq direc 위치’/‘fastq_1’ ‘fastq direc 위치’/‘fastq_2’ -o ‘해당 fastq의 sra run id direc’/‘해당 fastq의 sra run id.sam’				
-	ex) bwa mem -t 10 /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna /data/data/fastq/SRR12701911_1.fastq /data/data/fastq/SRR12701911_2.fastq –o ./data/data/SRR12701911/SRR12701911.sam 
 	+ ‘-o’는 output 값 저장 형식 위치를 위한 옵션 / ‘mem’ bwa 알고리즘 종류 / 
 	++ -t ‘10’ 사용할 thread 개수 (thread 수는 htop로 확인)
 	3. cat ‘샘플이름’.sam | grep –v ‘@’ | head -5 로 파일 확인 
@@ -89,27 +88,23 @@
 
 ### 3. Samtools  
 	1. samtools fixmate -O bam ‘sam 파일 위치’/SAMPLENAME.sam ‘bam 파일 위치’/SAMPLENAME.bam 
-	ex) samtools fixmate -O bam /data/data/SRR12701911/SRR12701911.sam /data/data/SRR12701911/SRR12701911.bam
 	+ ‘-O’는 output 값 저장 형식 위치를 위한 옵션 
 	
 ### 4. Sambamba  
 	1. 개별 sra run id directory에 mkdir sortBam로 sorting된 파일 넣을 directory 만들기
 	2. sambamba sort –t ‘thread’ –o ‘위치/’샘플이름‘.sort.bam ’위치‘/’샘플이름’.bam --tmpdir ./tmp
-	ex) sambamba sort –t 10 –o ‘/data/data/SRR12701911/sortBam/SRR12701911.sort.bam /data/data/SRR12701911/SRR12701911.bam —tmpdir ./tmp
 	+ ‘-t 10’ thread 10개 사용 의미 / ‘-o’는 output 값 저장 형식 위치를 위한 옵션 
 	
 ### 5. bcftools 
 	1. Generate VCF containing genotype likelihoods for one or multiple alignment (BAM or CRAM) files.
 		1-1. 개별 sra run id directory에 mkdir gvcf directory 만들기
 		1-2. bcftools mpileup –g ‘depth’ -Oz -o ./gvcf/샘플이름.gvcf.gz -f REF경로 ./sortBam/샘플이름.sort.bam
-		ex) bcftools mpileup –g 5 -Oz –o /data/data/SRR12701911/gvcf/SRR12701911.gvcf.gz –f /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna  /data/data/SRR12701911/sortBam/SRR12701911.sort.bam
-		+ ‘-g’ output gVCF형태로 파일 생성 depth 설정하여 그 이상의 것만을 생성, vcf는 일치하는 부분		을 생략하기에 일치 부분 생략 없이 표현하는 gvcf을 선택
+		+ ‘-g’ output gVCF형태로 파일 생성 depth 설정하여 그 이상의 것만을 생성, vcf는 일치하는 부분을 생략하기에 				일치 부분 생략 없이 표현하는 gvcf을 선택
 		++ ‘-Oz –o’는 Oz는 압축형식으로 o는 output 값 저장 형식 위치를 위한 옵션 
 		+++ ‘-f’는 ref을 위한 것
 
 	2. SNP/indel calling
 		2-1. bcftools call –g ‘depth’ -m -Oz –o ‘위치’/샘플이름.call.gvcf.gz ‘위치’/샘플이름.gvcf.gz
-		ex) bcftools call -g 5 -m -Oz -o gvcf/SRR12701911.call.gvcf.gz gvcf/SRR12701911.gvcf.gz
 		+  ‘-g’ output gVCF형태로 파일 생성 depth 설정하여 그 이상의 것만을 생성, vcf는 일치하는 
 		부분을 생략하기에 일치 부분 생략 없이 표현하는 gvcf을 선택
 		++ ‘-Oz –o’는 Oz는 압축형식으로 o는 output 값 저장 형식 위치를 위한 옵션 
@@ -122,21 +117,17 @@
 
 	3. indexing
 		3-1. bcftools index ‘위치/샘플이름’.call.gvcf.gz
-		ex) parallel –j 10 bcftools index ./data/assembly/{}.call.gvcf.gz :::: ./data/test/srrlist2.txt
 		+ ‘parallel’ command 이용해 동시 진행
 
 	4. merging
 		4-1. bcftools norm –f ‘ref 파일 경로’ -Oz –o ‘output 파일 경로’ ‘input 파일 경로’
-		ex) bcftools norm -f /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna -Oz -o /data/data/output/*.norm.gvcf.gz /data/data/output/*.call.gvcf.gz 
 		+ ‘-f’ reference genome을 제공한다는 의미
 		4-2. bcftools merge –g ‘ref 파일경로’ -m both -Oz –o ‘output 파일 경로’ ‘input 파일 경로’	
-		ex) bcftools merge -g /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna -m both -Oz -o /data/data/norm/test_merged.vcf.gz /data/data/norm/*.norm.gvcf.gz
 		+ ‘-g’는 gvcf 파일을 사용하는 옵션이고 ref이 있는 경우 작성한다.
 		++ ‘-m both’ indels과 snp모두 노출하는 옵션
 	
 	5. filtering
-		5-1. bcftools view –i 'filter criteria' -Oz –o ‘파일경로’/‘파일이름’.i.vcf.gz ‘파일경로’/‘파일이름’.vcf.v1.gz
-		ex) bcftools view -i 'F_MISSING < 0.05 && MAF > 0.1 && N_ALT>0 && %QUAL>= 30 && MQ >= 20' -Oz -o /data/data/output/test_merged.i.vcf.gz /data/data/output/test_merged.vcf.v1.gz
+		5-1. bcftools view –i 'filter criteria' -Oz –o ‘output파일경로’ ‘input 파일경로’
 		+ ‘-i’는 포함 조건의미 ‘filter criteria’칸 안에 조건을 기입한다. 조건 사이는 &&로 잇는다.
 		++ ‘-Oz –o’는 파일 저장 형식과 위치를 위한 옵션
 		+++ ‘F_MISSING’는 정보가 null인 값을 의미, ‘N_ALT’는 number of alternation alleles 의미
