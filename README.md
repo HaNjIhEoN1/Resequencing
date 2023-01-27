@@ -2,7 +2,12 @@
 본 script는 resequencing을 통한 유전분석을 위해 작성되었다. 필자가 배워가며 채우나가는 중....
  + 참조 1. https://thericejournal.springeropen.com/articles/10.1186/s12284-019-0356-0#ref-CR12
  + 참조 2. https://2wordspm.wordpress.com/2019/03/08/ngs-%EB%B6%84%EC%84%9D-%ED%8C%8C%EC%9D%B4%ED%94%84-%EB%9D%BC%EC%9D%B8%EC%9D%98-%EC%9D%B4%ED%95%B4-gatk-best-practice/
-
+ + 참조 3. https://titanic1997.tistory.com/3	 절대, 상대 경로에 대해
+ + SRA-Toolkit manual : https://github.com/ncbi/sra-tools/wiki/HowTo:-fasterq-dump 
+ + BWA manual : https://bio-bwa.sourceforge.net/bwa.shtml
+ + bcftools manual : https://samtools.github.io/bcftools/bcftools.html
+ + parallel manual : https://bioinformatics.stackexchange.com/questions/13914/download-multiple-fastq-files-using-fastq-dump
+ 
 ## Index
 
 0. 리눅스 환경조성 (프로그램 간 dependency 맞추기 위해)
@@ -17,6 +22,7 @@
 9. python을 통해 결과 해석 > python
 
 ### 0. 리눅스 분석환경 조성 
+
 #### 0.1. miniconda 설치
 	이유 : 필수적인 기능들은 갖추고 있으며 상대적으로 가벼워서
 	1. miniconda download 링크 복사 -> wget miniconda download link
@@ -28,8 +34,8 @@
 	2. conda activate 이름 -> 이름 환경으로 진입
 
 #### 0.2. 분석에 필요한 프로그램 다운로드
-	1. SRA-Toolkit download        https://github.com/ncbi/sra-tools/wiki/HowTo:-fasterq-dump  참조
-    1.1. download directory를 우선 만들고 download directory로 진입
+	1. SRA-Toolkit download	
+    		1.1. download directory를 우선 만들고 download directory로 진입
 		1.2. wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.0.2/sratoolkit.3.0.2-ubuntu64.tar.gz
 		1.3. tar.gz 파일로 다운이 진행 이를 압축해제하기 위한 ‘zxcf’ 옵션 사용
 			tar –zxvf sratoolkit.3.0.2-ubuntu64.tar.gz 로 압축해제
@@ -38,6 +44,21 @@
 		1.6. cd .. -> export PATH=$PATH:‘복사한 주소’
 	2. BWA~bcf tools download
 		google에 conda install ‘프로그램 이름’으로 검색 후 terminal에 ctrl +c,v
+		
+#### 0.3. 편의를 위한 shell 도구
+		1. parellel – 설치 sudo apt–get install –y parallel      
+				병렬 진행을 위한 command
+			+ faster dump로 multiple sra files download
+			case 1 : parellel –j n fasterq-dump –3 {} ::: ‘sra file run id들’
+				n : 다운로드 받을 sra file 개수  
+			case 2 : vi 또는 nano에 다운할 sra file run id 기입(enter로 구분)
+			parellel –j n fasterq-dump –3 :::: ‘기입한 문서 이름’
+		2. screen – 설치 sudo apt–get install screen
+				background 실행을 위한 command
+				ctrl + ad 탈출 / screen –S ‘이름’ : ‘이름’ screen 생성 
+				screen –R ‘이름’ : ‘이름’ screen 진입 / screen 내에서 exit : 삭제
+		3.  htop/ top – 설치 sudo apt–get install htop/top
+				작업관리자
     
 ### 1. SRA file download 
 	1. SRA run id 정보 얻기
@@ -50,18 +71,73 @@
 	3. faster-dump ‘run id’ -p --split –3
 			* ‘-p’ = 진척도 확인 옵션 / ‘--split –3’는 sra file fastq파일로 분리(paired면 2)
 			* 터미널에 fasterq-dump 로 각종 옵션 확인 가능
-		# parellel – 설치 sudo apt–get install –y parallel      
-				병렬 진행을 위한 command  download multiple sra files 참조
-		# screen – 설치 sudo apt–get install screen
-				background 실행을 위한 command
-				ctrl + ad 탈출 / screen –S ‘이름’ : ‘이름’ screen 생성 
-				screen –R ‘이름’ : ‘이름’ screen 진입 / screen 내에서 exit : 삭제
-		# htop/ top – 설치 sudo apt–get install htop/top
-				작업관리자
-		3.1. faster dump로 multiple sra files download
-		case 1 : parellel –j n fasterq-dump –3 {} ::: ‘sra file run id들’
-				n : 다운로드 받을 sra file 개수  
-		case 2 : vi 또는 nano에 다운할 sra file run id 기입(enter로 구분)
-			parellel –j n fasterq-dump –3 :::: ‘기입한 문서 이름’
    
 ### 2. BWA      
+	prerequisite : 종의 ref으로 사용될 fasta, fastq files을 위한 디렉토리, sra files 한 쌍당 하나의 디렉토리
+		모든 작업은 screen을 만들어 background 실행을 기본으로 한다(장기간 작업이 진행되므로)
+		모르는 옵션은 program command option으로 확인하자
+		*실습에 사용된 ref은 NCBI에서 제공하는 rice genome fasta data(GCF~)
+	1. BWA에 사용될려면 ref fasta를 indexing 해야한다. 
+	   bwa index GCF_001433935.1_IRGSP-1.0_genomic.fna
+	2. bwa mem –t ‘thread’ ‘ref 파일 위치’/‘ref 파일 이름’ ‘fastq direc 위치’/‘fastq_1’ ‘fastq direc 위치’/‘fastq_2’ -o ‘해당 fastq의 sra run id direc’/‘해당 fastq의 sra run id.sam’				
+	ex) bwa mem -t 10 /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna /data/data/fastq/SRR12701911_1.fastq /data/data/fastq/SRR12701911_2.fastq –o ./data/data/SRR12701911/SRR12701911.sam 
+	+ ‘-o’는 output 값 저장 형식 위치를 위한 옵션 / ‘mem’ bwa 알고리즘 종류 / 
+	++ -t ‘10’ 사용할 thread 개수 (thread 수는 htop로 확인)
+	3. cat ‘샘플이름’.sam | grep –v ‘@’ | head -5 로 파일 확인 
+	+ ‘grep –v ’@’는 @을 제외한 행 열람이고 sam의 header 및 meta정보는 @ > 필요없기에 생략
+	++ ‘head –5’는 앞부분 5행 출력
+
+### 3. Samtools  
+	1. samtools fixmate -O bam ‘sam 파일 위치’/SAMPLENAME.sam ‘bam 파일 위치’/SAMPLENAME.bam 
+	ex) samtools fixmate -O bam /data/data/SRR12701911/SRR12701911.sam /data/data/SRR12701911/SRR12701911.bam
+	+ ‘-O’는 output 값 저장 형식 위치를 위한 옵션 
+	
+### 4. Sambamba  
+	1. 개별 sra run id directory에 mkdir sortBam로 sorting된 파일 넣을 directory 만들기
+	2. sambamba sort –t ‘thread’ –o ‘위치/’샘플이름‘.sort.bam ’위치‘/’샘플이름’.bam --tmpdir ./tmp
+	ex) sambamba sort –t 10 –o ‘/data/data/SRR12701911/sortBam/SRR12701911.sort.bam /data/data/SRR12701911/SRR12701911.bam —tmpdir ./tmp
+	+ ‘-t 10’ thread 10개 사용 의미 / ‘-o’는 output 값 저장 형식 위치를 위한 옵션 
+	
+### 5. bcftools 
+	1. Generate VCF containing genotype likelihoods for one or multiple alignment (BAM or CRAM) files.
+		1-1. 개별 sra run id directory에 mkdir gvcf directory 만들기
+		1-2. bcftools mpileup –g ‘depth’ -Oz -o ./gvcf/샘플이름.gvcf.gz -f REF경로 ./sortBam/샘플이름.sort.bam
+		ex) bcftools mpileup –g 5 -Oz –o /data/data/SRR12701911/gvcf/SRR12701911.gvcf.gz –f /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna  /data/data/SRR12701911/sortBam/SRR12701911.sort.bam
+		+ ‘-g’ output gVCF형태로 파일 생성 depth 설정하여 그 이상의 것만을 생성, vcf는 일치하는 부분		을 생략하기에 일치 부분 생략 없이 표현하는 gvcf을 선택
+		++ ‘-Oz –o’는 Oz는 압축형식으로 o는 output 값 저장 형식 위치를 위한 옵션 
+		+++ ‘-f’는 ref을 위한 것
+
+	2. SNP/indel calling
+		2-1. bcftools call –g ‘depth’ -m -Oz –o ‘위치’/샘플이름.call.gvcf.gz ‘위치’/샘플이름.gvcf.gz
+		ex) bcftools call -g 5 -m -Oz -o gvcf/SRR12701911.call.gvcf.gz gvcf/SRR12701911.gvcf.gz
+		+  ‘-g’ output gVCF형태로 파일 생성 depth 설정하여 그 이상의 것만을 생성, vcf는 일치하는 
+		부분을 생략하기에 일치 부분 생략 없이 표현하는 gvcf을 선택
+		++ ‘-Oz –o’는 Oz는 압축형식으로 o는 output 값 저장 형식 위치를 위한 옵션 
+		+++ ‘-m’ varinat calling을 위한 옵션
+		2-2. zcat ‘샘플이름’.call.gvcf.gz | grep –v ‘#’ | head -5 로 파일 확인 
+		+ ‘zcat’는 확장자 gz인 파일 열람
+		++ ‘grep –v ’#’는 #을 제외한 행 열람이고 call.gvcf.gz의 header 및 meta정보는 # > 
+		필요없기에 생략
+		+++ ‘head –5’는 앞부분 5행 출력
+
+	3. indexing
+		3-1. bcftools index ‘위치/샘플이름’.call.gvcf.gz
+		ex) parallel –j 10 bcftools index ./data/assembly/{}.call.gvcf.gz :::: ./data/test/srrlist2.txt
+		+ ‘parallel’ command 이용해 동시 진행
+
+	4. merging
+		4-1. bcftools norm –f ‘ref 파일 경로’ -Oz –o ‘output 파일 경로’ ‘input 파일 경로’
+		ex) bcftools norm -f /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna -Oz -o /data/data/output/*.norm.gvcf.gz /data/data/output/*.call.gvcf.gz 
+		+ ‘-f’ reference genome을 제공한다는 의미
+		4-2. bcftools merge –g ‘ref 파일경로’ -m both -Oz –o ‘output 파일 경로’ ‘input 파일 경로’	
+		ex) bcftools merge -g /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna -m both -Oz -o /data/data/norm/test_merged.vcf.gz /data/data/norm/*.norm.gvcf.gz
+		+ ‘-g’는 gvcf 파일을 사용하는 옵션이고 ref이 있는 경우 작성한다.
+		++ ‘-m both’ indels과 snp모두 노출하는 옵션
+	
+	5. filtering
+		5-1. bcftools view –i 'filter criteria' -Oz –o ‘파일경로’/‘파일이름’.i.vcf.gz ‘파일경로’/‘파일이름’.vcf.v1.gz
+		ex) bcftools view -i 'F_MISSING < 0.05 && MAF > 0.1 && N_ALT>0 && %QUAL>= 30 && MQ >= 20' -Oz -o /data/data/output/test_merged.i.vcf.gz /data/data/output/test_merged.vcf.v1.gz
+		+ ‘-i’는 포함 조건의미 ‘filter criteria’칸 안에 조건을 기입한다. 조건 사이는 &&로 잇는다.
+		++ ‘-Oz –o’는 파일 저장 형식과 위치를 위한 옵션
+		+++ ‘F_MISSING’는 정보가 null인 값을 의미, ‘N_ALT’는 number of alternation alleles 의미
+		
