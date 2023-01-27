@@ -94,6 +94,7 @@
 	1. 개별 sra run id directory에 mkdir sortBam로 sorting된 파일 넣을 directory 만들기
 	2. sambamba sort –t ‘thread’ –o ‘위치/’샘플이름‘.sort.bam ’위치‘/’샘플이름’.bam --tmpdir ./tmp
 	+ ‘-t 10’ thread 10개 사용 의미 / ‘-o’는 output 값 저장 형식 위치를 위한 옵션 
+	+ ‘—tmpdir’은 임시 directory을 사용하여 저장하는 옵션, sort 중간과정을 위한 directory 생성
 	
 ### 5. bcftools 
 	1. Generate VCF containing genotype likelihoods for one or multiple alignment (BAM or CRAM) files.
