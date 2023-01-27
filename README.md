@@ -35,7 +35,7 @@
 
 #### 0.2. 분석에 필요한 프로그램 다운로드
 	1. SRA-Toolkit download	
-    		1.1. download directory를 우선 만들고 download directory로 진입
+    	1.1. download directory를 우선 만들고 download directory로 진입
 		1.2. wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/3.0.2/sratoolkit.3.0.2-ubuntu64.tar.gz
 		1.3. tar.gz 파일로 다운이 진행 이를 압축해제하기 위한 ‘zxcf’ 옵션 사용
 			tar –zxvf sratoolkit.3.0.2-ubuntu64.tar.gz 로 압축해제
@@ -48,7 +48,7 @@
 #### 0.3. 편의를 위한 shell 도구
 		1. parellel – 설치 sudo apt–get install –y parallel      
 				병렬 진행을 위한 command
-			+ faster dump로 multiple sra files download
+			+ fasterq dump로 multiple sra files download
 			case 1 : parellel –j n fasterq-dump –3 {} ::: ‘sra file run id들’
 				n : 다운로드 받을 sra file 개수  
 			case 2 : vi 또는 nano에 다운할 sra file run id 기입(enter로 구분)
@@ -68,7 +68,7 @@
 	*SRA data는 사라지지 않는 물리 저장고에 저장 본인 실습환경 안에서는 ‘/data’
 	-> 서버를 사용하지 않는 컴퓨터라면 무관
 	2. sra file 받을 directory 생성 후 작업
-	3. faster-dump ‘run id’ -p --split –3
+	3. fasterq-dump ‘run id’ -p --split –3
 			* ‘-p’ = 진척도 확인 옵션 / ‘--split –3’는 sra file fastq파일로 분리(paired면 2)
 			* 터미널에 fasterq-dump 로 각종 옵션 확인 가능
    
