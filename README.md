@@ -42,6 +42,10 @@
 		1.4. 압축해제된 파일 內 ‘bin’으로 진입
 		1.5. pwd 명령어를 이용해 bin path 복사
 		1.6. cd .. -> export PATH=$PATH:‘복사한 주소’
+		+ 지역변수로 영구 적용하기 위해서 export PATH=$PATH:’복사 주소‘ >> ~/.bashrc
+		source ~/.bashrc
+		> 바뀐 내용을 .bashrc에 적용하고 이를 반영한다는 의미. 
+		++ 위 miniconda 설치과정 중에 자동으로 redirect 까지 적용해줌		
 	2. BWA~bcf tools download
 		google에 conda install ‘프로그램 이름’으로 검색 후 terminal에 ctrl +c,v
 		
