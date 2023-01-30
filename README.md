@@ -50,19 +50,19 @@
 		google에 conda install ‘프로그램 이름’으로 검색 후 terminal에 ctrl +c,v
 		
 #### 0.3. 편의를 위한 shell 도구
-		1. parellel – 설치 sudo apt–get install –y parallel      
-				병렬 진행을 위한 command
-			+ fasterq dump로 multiple sra files download
-			case 1 : parellel –j n fasterq-dump –3 {} ::: ‘sra file run id들’
-				n : 다운로드 받을 sra file 개수  
-			case 2 : vi 또는 nano에 다운할 sra file run id 기입(enter로 구분)
-			parellel –j n fasterq-dump –3 :::: ‘기입한 문서 이름’
-		2. screen – 설치 sudo apt–get install screen
-				background 실행을 위한 command
-				ctrl + ad 탈출 / screen –S ‘이름’ : ‘이름’ screen 생성 
-				screen –R ‘이름’ : ‘이름’ screen 진입 / screen 내에서 exit : 삭제
-		3.  htop/ top – 설치 sudo apt–get install htop/top
-				작업관리자
+	1. parellel – 설치 sudo apt–get install –y parallel      
+		병렬 진행을 위한 command
+		+ fasterq dump로 multiple sra files download
+		case 1 : parellel –j n fasterq-dump –3 {} ::: ‘sra file run id들’
+			n : 다운로드 받을 sra file 개수  
+		case 2 : vi 또는 nano에 다운할 sra file run id 기입(enter로 구분)
+		parellel –j n fasterq-dump –3 :::: ‘기입한 문서 이름’
+	2. screen – 설치 sudo apt–get install screen
+		background 실행을 위한 command
+		ctrl + ad 탈출 / screen –S ‘이름’ : ‘이름’ screen 생성 
+		screen –R ‘이름’ : ‘이름’ screen 진입 / screen 내에서 exit : 삭제
+	3.  htop/ top – 설치 sudo apt–get install htop/top
+		작업관리자 역할
     
 ### 1. SRA file download 
 	1. SRA run id 정보 얻기
