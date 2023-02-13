@@ -2,11 +2,11 @@
 본 script는 resequencing을 통한 유전분석을 위해 작성되었다. 필자가 배워가며 채우나가는 중....
  + 참조 1. https://thericejournal.springeropen.com/articles/10.1186/s12284-019-0356-0#ref-CR12
  + 참조 2. https://2wordspm.wordpress.com/2019/03/08/ngs-%EB%B6%84%EC%84%9D-%ED%8C%8C%EC%9D%B4%ED%94%84-%EB%9D%BC%EC%9D%B8%EC%9D%98-%EC%9D%B4%ED%95%B4-gatk-best-practice/
- + 참조 3. https://titanic1997.tistory.com/3	 절대, 상대 경로에 대해
- + SRA-Toolkit manual : https://github.com/ncbi/sra-tools/wiki/HowTo:-fasterq-dump 
- + BWA manual : https://bio-bwa.sourceforge.net/bwa.shtml
- + bcftools manual : https://samtools.github.io/bcftools/bcftools.html
- + parallel manual : https://bioinformatics.stackexchange.com/questions/13914/download-multiple-fastq-files-using-fastq-dump
+ + [절대/상대경로](https://titanic1997.tistory.com/3)
+ + [SRA-Toolkit manual](https://github.com/ncbi/sra-tools/wiki/HowTo:-fasterq-dump) 
+ + [BWA manual](https://bio-bwa.sourceforge.net/bwa.shtml)
+ + [bcftools manual](https://samtools.github.io/bcftools/bcftools.html)
+ + [parallel manual](https://bioinformatics.stackexchange.com/questions/13914/download-multiple-fastq-files-using-fastq-dump)
  
 ## Index
 
