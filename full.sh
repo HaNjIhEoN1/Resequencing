@@ -12,9 +12,9 @@ bcftools call -g 5 -m -Oz -o gvcf/{}.call.gvcf.gz gvcf/{}.gvcf.gz :::: srrlist2.
 
 bcftools index ./output/{}.call.gvcf.gz :::: srrlist2.txt
 
-echo "finish"
+bcftools norm -f /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna -Oz -o /data/data/output/{}.norm.gvcf.gz /data/data/output/{}.call.gvcf.gz :::: srrlist2.txt
 
-bcftools norm -f /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna -Oz -o /data/data/output/*.norm.gvcf.gz /data/data/output/*.call.gvcf.gz 
+echo "finish"
 
 bcftools merge -g /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna -m both -Oz -o /data/data/norm/test_merged.vcf.gz /data/data/norm/*.norm.gvcf.gz
 
