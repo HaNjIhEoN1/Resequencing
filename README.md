@@ -93,7 +93,7 @@
 ### 3. Samtools  
 	1. samtools fixmate -O bam ‘sam 파일 위치’/SAMPLENAME.sam ‘bam 파일 위치’/SAMPLENAME.bam 
 	+ ‘-O’는 output 값 저장 형식 위치를 위한 옵션 
-	
+	++ samtools bam2fq input.bam | seqtk seq -A - > output.fa [bam to fastq]
 ### 4. Sambamba  
 	1. 개별 sra run id directory에 mkdir sortBam로 sorting된 파일 넣을 directory 만들기
 	2. sambamba sort –t ‘thread’ –o ‘위치/’샘플이름‘.sort.bam ’위치‘/’샘플이름’.bam --tmpdir ./tmp
