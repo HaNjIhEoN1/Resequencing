@@ -6,6 +6,8 @@ samtools fixmate -O bam sam/{}.sam bam/{}.bam :::: srrlist2.txt &&
 
 sambamba sort -t 5 -o sortbam/{}.sort.bam bam/{}.bam --tmpdir ./tmp :::: srrlist2.txt &&
 
+samtools markdup sortbam/{}.sort.bam markdup/{}.markdup.bam &&
+
 bcftools mpileup -g 5 -Oz -o gvcf/{}.gvcf.gz -f assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna sortbam/{}.sort.bam:::: srrlist2.txt &&
 
 bcftools call -g 5 -m -Oz -o gvcf/{}.call.gvcf.gz gvcf/{}.gvcf.gz :::: srrlist2.txt &&
