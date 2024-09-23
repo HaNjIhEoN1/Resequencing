@@ -14,4 +14,7 @@ bwa mem  -t 10 /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna /data/d
 samtools fixmate -O bam /data/data/SRR12701911/SRR12701911.sam /data/data/SRR12701911/SRR12701911.bam
 
 # sorting bam by using sambamba
-sambamba sort –t 10 –o ‘/data/data/SRR12701911/sortBam/SRR12701911.sort.bam /data/data/SRR12701911/SRR12701911.bam —tmpdir ./tmp
+sambamba sort –t 10 –o /data/data/SRR12701911/sortBam/SRR12701911.sort.bam /data/data/SRR12701911/SRR12701911.bam —tmpdir ./tmp
+
+# marked up
+samtools markdup /data/data/SRR12701911/sortBam/SRR12701911.sort.bam /data/data/SRR12701911/sortBam/SRR12701911.markdup.bam
