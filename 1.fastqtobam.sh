@@ -8,7 +8,7 @@ parallel -j n fasterq-dump -3 {} :::: srridlist # list에 download 받을 id 기
 
 # fasterq to sam by using bwa
 bwa index GCF_001433935.1_IRGSP-1.0_genomic.fna
-bwa mem  -t 10 /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna /data/data/fastq/SRR12701911_1.fastq /data/data/fastq/SRR12701911_2.fastq –o ./data/data/SRR12701911/SRR12701911.sam 
+bwa mem  -t 10 /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna /data/data/fastq/SRR12701911_1.fastq /data/data/fastq/SRR12701911_2.fastq > ./data/data/SRR12701911/SRR12701911.sam 
 
 # fixmating process by using samtools
 samtools fixmate -O bam /data/data/SRR12701911/SRR12701911.sam /data/data/SRR12701911/SRR12701911.bam
