@@ -1,6 +1,6 @@
 parallel -j 1 fasterq-dump –3 :::: ‘srrlist2.txt’ &&
 
-bwa mem –t 5 /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna /data/data/fastq/{.}_1.fastq /data/data/fastq/{.}_2.fastq -o ./data/data/test/sam/{.}.sam :::: srrlist2.txt &&
+bwa mem –t 5 /data/data/assembly/GCF_001433935.1_IRGSP-1.0_genomic.fna /data/data/fastq/{.}_1.fastq /data/data/fastq/{.}_2.fastq > ./data/data/test/sam/{.}.sam :::: srrlist2.txt &&
 
 samtools fixmate -O bam sam/{}.sam bam/{}.bam :::: srrlist2.txt &&
 
